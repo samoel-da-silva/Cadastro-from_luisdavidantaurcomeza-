@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Cadastro</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 40px; }
+        .form-container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .checkbox-group label { font-weight: normal; display: inline-block; margin-right: 15px; cursor: pointer;}
+        
+        /* Oculta a caixa de observação por padrão */
+        #caixa-observacao { display: none; margin-top: 15px; }
+        
+        button { width: 100%; padding: 12px; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #004494; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Novo Cadastro</h2>
+    <form action="/cadastrar" method="POST">
+        
+        <div class="form-group">
+            <label for="nome">Nome Completo</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefone">Número de Telefone (Somente números)</label>
+            <!-- maxlength e regex no oninput garantem que não azaralhem o DB -->
+            <input type="text" id="telefone" name="telefone" maxlength="11" placeholder="Ex: 41987859370" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        </div>
+
+        <div class="form-group">
+            <label for="documento">CPF ou RG (Somente números)</label>
+            <input type="text" id="documento" name="documento" maxlength="11" placeholder="9 dígitos (RG) ou 11 dígitos (CPF)" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label><strong>Selecione o Vínculo:</strong></label><br>
+            <label><input type="checkbox" class="cb-vinculo" name="vinculo" value="Aluno"> Aluno</label>
+            <label><input type="checkbox" class="cb-vinculo" name="vinculo" value="Pai/Mãe"> Pai/Mãe</label>
+            <label><input type="checkbox" class="cb-vinculo" name="vinculo" value="Responsavel"> Responsável</label>
+            <label><input type="checkbox" class="cb-vinculo" name="vinculo" value="Autoridade"> Autoridade</label>
+        </div>
+
+        <div class="form-group" id="caixa-observacao">
+            <label id="label-observacao" for="observacao">Observação</label>
+            <input type="text" id="observacao" name="observacao">
+        </div>
+
+        <button type="submit">Enviar Cadastro</button>
+    </form>
+</div>
+
+<script>
+    const checkboxes = document.querySelectorAll('.cb-vinculo');
+    const caixaObservacao = document.getElementById('caixa-observacao');
+    const labelObservacao = document.getElementById('label-observacao');
+    const inputObservacao = document.getElementById('observacao');
+
+    // Textos personalizados baseados na seleção
+    const textosObservacao = {
+        'Aluno': 'Turma e turno:',
+        'Pai/Mãe': 'Por quem é responsável:',
+        'Responsavel': 'Responsável por:',
+        'Autoridade': 'Qual autoridade ela é:'
+    };
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Desmarca todas as outras checkboxes (simulando um radio button)
+                checkboxes.forEach(cb => {
+                    if (cb !== this) cb.checked = false;
+                });
+
+                // Mostra e configura a caixa de observação
+                caixaObservacao.style.display = 'block';
+                labelObservacao.textContent = textosObservacao[this.value];
+                inputObservacao.required = true;
+                
+            } else {
+                // Se desmarcar, esconde a caixa
+                caixaObservacao.style.display = 'none';
+                inputObservacao.required = false;
+                inputObservacao.value = '';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
